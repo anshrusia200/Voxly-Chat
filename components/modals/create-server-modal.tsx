@@ -51,7 +51,7 @@ export const CreateServerModal = () => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSumit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.post("/api/servers", values);
       form.reset();
@@ -80,7 +80,7 @@ export const CreateServerModal = () => {
         <Form {...form}>
           <form
             action=""
-            onSubmit={form.handleSubmit(onSumit)}
+            onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8"
           >
             <div className="space-y-8 px-6">
