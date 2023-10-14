@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import FileUpload from "../file-upload";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/hooks/use-modal-store";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -36,15 +37,11 @@ const formSchema = z.object({
     message: "Server image is required",
   }),
 });
-const InitialModal = () => {
-  const [isMounted, setIsMounted] = useState(false);
-
+export const EditServerModal = () => {
+  const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
+  const { server } = data;
+  const isModalOpen = isOpen && type === "editServer";
   const form = useForm({
     defaultValues: {
       name: "",
@@ -52,23 +49,31 @@ const InitialModal = () => {
     },
   });
 
+  useEffect(() => {
+    if (server) {
+      form.setValue("name", server.name);
+      form.setValue("imageUrl", server.imageUrl);
+    }
+  }, [server, form]);
+
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.post("/api/servers", values);
+      await axios.patch(`/api/servers/${server?.id}`, values);
       form.reset();
       router.refresh();
-      window.location.reload();
+      onClose();
     } catch (error) {
       console.log(error);
     }
   };
-
-  if (!isMounted) return null;
-
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
   return (
-    <Dialog open>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
@@ -126,7 +131,7 @@ const InitialModal = () => {
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4">
               <Button variant="primary" disabled={isLoading}>
-                Create
+                Save
               </Button>
             </DialogFooter>
           </form>
@@ -135,5 +140,3 @@ const InitialModal = () => {
     </Dialog>
   );
 };
-
-export default InitialModal;
