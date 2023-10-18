@@ -12,25 +12,32 @@ import { useModal } from "@/hooks/use-modal-store";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Check, Copy, DoorOpen, Loader2, RefreshCw } from "lucide-react";
+import {
+  Check,
+  Copy,
+  DoorOpen,
+  Loader2,
+  RefreshCw,
+  Trash2,
+} from "lucide-react";
 import { useOrigin } from "@/hooks/use-origin";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-export const LeaveServerModal = () => {
+export const DeleteServerModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const origin = useOrigin();
   const router = useRouter();
-  const isModalOpen = isOpen && type === "leaveServer";
+  const isModalOpen = isOpen && type === "deleteServer";
   const { server } = data;
   const [confirmText, setConfirmText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const onLeave = async () => {
+  const onDelete = async () => {
     try {
       setIsLoading(true);
-      await axios.patch(`/api/servers/${server?.id}/leave`);
+      await axios.delete(`/api/servers/${server?.id}`);
       onClose();
       router.refresh();
       router.push("/");
@@ -50,13 +57,14 @@ export const LeaveServerModal = () => {
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Leave Server
+            Delete Server
           </DialogTitle>
         </DialogHeader>
         <div className="p-6">
           <Label className="text-xs font-bold text-zinc-500 dark:text-secondary/70">
-            Type <span className="text-red-500">{server?.name}</span> to confirm
-            exiting the server
+            This action is permanent. The server along with all its data will be
+            deleted. Type <span className="text-red-500">{server?.name}</span>{" "}
+            to confirm deleting the server
           </Label>
           <div className="flex items-center mt-2 gap-x-2">
             <Input
@@ -70,18 +78,18 @@ export const LeaveServerModal = () => {
             <Button
               variant="destructive"
               className="mt-5 w-[50%] mx-auto"
-              onClick={onLeave}
+              onClick={onDelete}
               disabled={isLoading || confirmText !== server?.name}
             >
               {isLoading ? (
                 <>
-                  Leaving
+                  Deleting
                   <Loader2 className="animate-spin text-zinc-500 ml-auto w-4 h-4" />
                 </>
               ) : (
                 <>
-                  Leave
-                  <DoorOpen className="h-4 w-4 ml-2 " />
+                  Delete
+                  <Trash2 className="h-4 w-4 ml-2 " />
                 </>
               )}
             </Button>
