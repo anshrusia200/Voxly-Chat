@@ -145,7 +145,7 @@ const ServerSideBar = async ({ serverId }: ServerSideBarProps) => {
             <Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2" />
             <ServerSection
               sectionType="channels"
-              channelType={ChannelType.TEXT}
+              channelType={ChannelType.VIDEO}
               role={role}
               label="Video channels"
             />
@@ -164,7 +164,7 @@ const ServerSideBar = async ({ serverId }: ServerSideBarProps) => {
             <Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2" />
             <ServerSection
               sectionType="channels"
-              channelType={ChannelType.TEXT}
+              channelType={ChannelType.AUDIO}
               role={role}
               label="Audio channels"
             />

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import qs from "query-string";
 import { useModal } from "@/hooks/use-modal-store";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useOrigin } from "@/hooks/use-origin";
 import { ServerWithMembersWithProfiles } from "@/types";
 import { ScrollArea } from "../ui/scroll-area";
