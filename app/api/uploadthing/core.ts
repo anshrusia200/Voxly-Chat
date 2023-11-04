@@ -3,6 +3,13 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 
 const f = createUploadthing();
 
+// import { UTApi } from "uploadthing/server";
+// export const utapi = new UTApi();
+
+// export const fileDelete = async (fileKey: string) => {
+//   await utapi.deleteFiles(fileKey);
+// };
+
 const handleAuth = () => {
   const { userId } = auth();
   if (!userId) throw new Error("Unauthorized");

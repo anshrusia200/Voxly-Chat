@@ -27,7 +27,7 @@ import { useParams, useRouter } from "next/navigation";
 
 export const DeleteChannelModal = () => {
   const { isOpen, onClose, type, data } = useModal();
-  const origin = useOrigin();
+  // const origin = useOrigin();
   const router = useRouter();
   const isModalOpen = isOpen && type === "deleteChannel";
   const { server, channel } = data;

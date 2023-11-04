@@ -19,7 +19,7 @@ import axios from "axios";
 
 export const InviteModal = () => {
   const { onOpen, isOpen, onClose, type, data } = useModal();
-  const origin = useOrigin();
+  // const origin = useOrigin();
   const isModalOpen = isOpen && type === "invite";
   const { server } = data;
 

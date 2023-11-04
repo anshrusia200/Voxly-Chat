@@ -49,7 +49,7 @@ const roleIconMap = {
 export const MembersModal = () => {
   const { onOpen, isOpen, onClose, type, data } = useModal();
   const [loadingId, setLoadingId] = useState("");
-  const origin = useOrigin();
+  // const origin = useOrigin();
   const router = useRouter();
   const isModalOpen = isOpen && type === "members";
   const { server } = data as { server: ServerWithMembersWithProfiles };
