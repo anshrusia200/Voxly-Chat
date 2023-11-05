@@ -99,6 +99,7 @@ const MessageFileModal = () => {
                           endpoint="messageFile"
                           value={field.value}
                           onChange={field.onChange}
+                          className="rounded-none w-[400px] h-[300px] object-scale-down"
                         />
                       </FormControl>
                     </FormItem>
@@ -107,7 +108,10 @@ const MessageFileModal = () => {
               </div>
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4">
-              <Button variant="primary" disabled={isLoading}>
+              <Button
+                variant="primary"
+                disabled={isLoading || !form.getValues("fileUrl")}
+              >
                 Send
               </Button>
             </DialogFooter>

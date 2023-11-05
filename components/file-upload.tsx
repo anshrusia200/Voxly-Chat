@@ -4,15 +4,22 @@ import { FileIcon, X } from "lucide-react";
 import { UploadDropzone, UploadButton } from "@/lib/uploadthing";
 import "@uploadthing/react/styles.css";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 // import { fileDelete } from "@/app/api/uploadthing/core";
 
 interface FileUploadProps {
   onChange: (url?: string) => void;
   value: string;
   endpoint: "messageFile" | "serverImage";
+  className?: string;
 }
 
-const FileUpload = ({ onChange, value, endpoint }: FileUploadProps) => {
+const FileUpload = ({
+  onChange,
+  value,
+  endpoint,
+  className,
+}: FileUploadProps) => {
   const fileType = value?.split(".").pop();
   console.log(value);
   const temp = value?.split("/")[4]?.split(".")[0];
@@ -26,8 +33,13 @@ const FileUpload = ({ onChange, value, endpoint }: FileUploadProps) => {
 
   if (value && fileType !== "pdf") {
     return (
-      <div className="relative h-20 w-20">
-        <Image fill src={value} alt="Upload" className="rounded-full" />
+      <div className={cn("relative h-20 w-20", className)}>
+        <Image
+          fill
+          src={value}
+          alt="Upload"
+          className={cn("rounded-full", className)}
+        />
         <button
           onClick={() => {
             // fileDelete(fileKey);
