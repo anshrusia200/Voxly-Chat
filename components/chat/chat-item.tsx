@@ -22,6 +22,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useModal } from "@/hooks/use-modal-store";
+import { useRouter, useParams } from "next/navigation";
 
 interface ChatItemProps {
   id: string;
@@ -62,9 +64,14 @@ export const ChatItem = ({
   socketQuery,
 }: ChatItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [height, setHeight] = useState(0);
-  const [width, setWidth] = useState(0);
+  const { onOpen } = useModal();
+
+  const onMemberClick = () => {
+    if (member.id === currentMember.id) {
+      return;
+    }
+    router.push(`/server/${params?.serverId}/conversations/member.id`);
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -229,12 +236,7 @@ export const ChatItem = ({
                     control={form.control}
                     name="content"
                     render={({ field }) => (
-                      <FormItem
-                        className={cn(
-                          "flex-1",
-                          width && `w-[${Math.floor(width)}px]`
-                        )}
-                      >
+                      <FormItem className={cn("flex-1")}>
                         <FormControl>
                           <div className="relative w-full">
                             <Input
@@ -280,7 +282,15 @@ export const ChatItem = ({
               </ActionTooltip>
             )}
             <ActionTooltip label="Delete">
-              <Trash className="cursor-pointer ml-auto h-4 w-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition " />
+              <Trash
+                onClick={() => {
+                  onOpen("deleteMessage", {
+                    apiUrl: `${socketUrl}/${id}`,
+                    query: socketQuery,
+                  });
+                }}
+                className="cursor-pointer ml-auto h-4 w-4 text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition "
+              />
             </ActionTooltip>
             {(isImage || isPDF) && (
               <ActionTooltip label="Download">
