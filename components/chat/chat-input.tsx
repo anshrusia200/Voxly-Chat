@@ -11,6 +11,7 @@ import axios from "axios";
 import qs from "query-string";
 import EmojiPicker from "../emoji-picker";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 interface ChatInputProps {
   apiUrl: string;
@@ -24,6 +25,7 @@ const formSchema = z.object({
 });
 
 const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
+  const inputRef = useRef<any>(null);
   const { onOpen } = useModal();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -34,7 +36,11 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
   });
 
   const isLoading = form.formState.isSubmitting;
-
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isLoading]);
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const url = qs.stringifyUrl({
@@ -70,7 +76,9 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                     placeholder={`Message ${
                       type === "conversation" ? name : "#" + name
                     }`}
+                    autoFocus
                     {...field}
+                    ref={inputRef}
                   />
                   <div className="absolute top-7 right-8">
                     <EmojiPicker

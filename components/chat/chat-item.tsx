@@ -65,12 +65,14 @@ export const ChatItem = ({
 }: ChatItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const { onOpen } = useModal();
+  const router = useRouter();
+  const params = useParams();
 
   const onMemberClick = () => {
     if (member.id === currentMember.id) {
       return;
     }
-    router.push(`/server/${params?.serverId}/conversations/member.id`);
+    router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,6 +91,7 @@ export const ChatItem = ({
         query: socketQuery,
       });
       await axios.patch(url, values);
+      setIsEditing(false);
     } catch (error) {}
   };
 
@@ -156,7 +159,10 @@ export const ChatItem = ({
           isOwner && "flex-row-reverse"
         )}
       >
-        <div className="cursor-pointer hover:drop-shadow-empty">
+        <div
+          className="cursor-pointer hover:drop-shadow-empty"
+          onClick={onMemberClick}
+        >
           <UserAvatar src={member.profile.imageUrl} />
         </div>
         <div
@@ -164,7 +170,7 @@ export const ChatItem = ({
         >
           <div className="flex items-center gap-x-2">
             {!isOwner && (
-              <div className="flex items-center">
+              <div className="flex items-center" onClick={onMemberClick}>
                 <p className="text-sm hover:underline cursor-pointer">
                   {member.profile.name}
                 </p>
@@ -242,7 +248,7 @@ export const ChatItem = ({
                             <Input
                               disabled={isLoading}
                               className={cn(
-                                "p-2 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 darkLtext-zinc-200"
+                                "p-2 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 dark:text-zinc-200"
                               )}
                               placeholder="Edited message"
                               {...field}

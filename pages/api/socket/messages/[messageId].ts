@@ -1,11 +1,9 @@
 import { NextApiRequest } from "next";
+import { MemberRole } from "@prisma/client";
+
 import { NextApiResponseServerIo } from "@/types";
 import { currentProfilePages } from "@/lib/current-profile-pages";
-
 import { db } from "@/lib/db";
-import { triggerAsyncId } from "async_hooks";
-import { MemberRole } from "@prisma/client";
-import { tr } from "date-fns/locale";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,12 +21,15 @@ export default async function handler(
     if (!profile) {
       return res.status(401).json({ error: "Unauthorized" });
     }
+
     if (!serverId) {
-      return res.status(400).json({ error: "Server id missig" });
+      return res.status(400).json({ error: "Server ID missing" });
     }
+
     if (!channelId) {
-      return res.status(400).json({ error: "Channel Id missing" });
+      return res.status(400).json({ error: "Channel ID missing" });
     }
+
     const server = await db.server.findFirst({
       where: {
         id: serverId as string,
@@ -42,24 +43,30 @@ export default async function handler(
         members: true,
       },
     });
+
     if (!server) {
-      return res.status(400).json({ error: "Server not found" });
+      return res.status(404).json({ error: "Server not found" });
     }
+
     const channel = await db.channel.findFirst({
       where: {
         id: channelId as string,
         serverId: serverId as string,
       },
     });
+
     if (!channel) {
-      return res.status(400).json({ error: "Channel not found" });
+      return res.status(404).json({ error: "Channel not found" });
     }
-    const member = await server.members.find(
+
+    const member = server.members.find(
       (member) => member.profileId === profile.id
     );
+
     if (!member) {
-      return res.status(400).json({ error: "Member not found" });
+      return res.status(404).json({ error: "Member not found" });
     }
+
     let message = await db.message.findFirst({
       where: {
         id: messageId as string,
@@ -73,9 +80,11 @@ export default async function handler(
         },
       },
     });
+
     if (!message || message.deleted) {
-      return res.status(404).json({ error: "message not found" });
+      return res.status(404).json({ error: "Message not found" });
     }
+
     const isMessageOwner = message.memberId === member.id;
     const isAdmin = member.role === MemberRole.ADMIN;
     const isModerator = member.role === MemberRole.MODERATOR;
@@ -92,7 +101,7 @@ export default async function handler(
         },
         data: {
           fileUrl: null,
-          content: "This message has been deleted",
+          content: "This message has been deleted.",
           deleted: true,
         },
         include: {
@@ -104,10 +113,12 @@ export default async function handler(
         },
       });
     }
+
     if (req.method === "PATCH") {
       if (!isMessageOwner) {
         return res.status(401).json({ error: "Unauthorized" });
       }
+
       message = await db.message.update({
         where: {
           id: messageId as string,
@@ -124,9 +135,14 @@ export default async function handler(
         },
       });
     }
-    const updateKey = `chat:${channelId}:message:update`;
-    res?.socket?.server?.io.emit(updateKey, message);
+
+    const updateKey = `chat:${channelId}:messages:update`;
+
+    res?.socket?.server?.io?.emit(updateKey, message);
 
     return res.status(200).json(message);
-  } catch (error) {}
+  } catch (error) {
+    console.log("[MESSAGE_ID]", error);
+    return res.status(500).json({ error: "Internal Error" });
+  }
 }
