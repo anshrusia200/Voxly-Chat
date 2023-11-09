@@ -1,13 +1,24 @@
 "use client";
+
+import { Fragment, useRef, ElementRef } from "react";
 import { format } from "date-fns";
 import { Member, Message, Profile } from "@prisma/client";
-import ChatWelcome from "./chat-welcome";
+import { Loader2, ServerCrash } from "lucide-react";
+
 import { useChatQuery } from "@/hooks/use-chat-query";
-import { Loader, Loader2, ServerCrash } from "lucide-react";
-import { Fragment, useRef, ElementRef } from "react";
-import { ChatItem } from "./chat-item";
 import { useChatSocket } from "@/hooks/use-chat-socket";
 import { useChatScroll } from "@/hooks/use-chat-scroll";
+
+import ChatWelcome from "./chat-welcome";
+import { ChatItem } from "./chat-item";
+
+const DATE_FORMAT = "d MMM yyyy, HH:mm";
+
+type MessageWithMemberWithProfile = Message & {
+  member: Member & {
+    profile: Profile;
+  };
+};
 
 interface ChatMessagesProps {
   name: string;
@@ -21,15 +32,7 @@ interface ChatMessagesProps {
   type: "channel" | "conversation";
 }
 
-const DATE_FORMAT = "d MMM yyy, HH:mm";
-
-type MessageWithMemberWithProfile = Message & {
-  member: Member & {
-    profile: Profile;
-  };
-};
-
-const ChatMessages = ({
+export const ChatMessages = ({
   name,
   member,
   chatId,
@@ -43,11 +46,17 @@ const ChatMessages = ({
   const queryKey = `chat:${chatId}`;
   const addKey = `chat:${chatId}:messages`;
   const updateKey = `chat:${chatId}:messages:update`;
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-    useChatQuery({ queryKey, apiUrl, paramKey, paramValue });
+
   const chatRef = useRef<ElementRef<"div">>(null);
   const bottomRef = useRef<ElementRef<"div">>(null);
 
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+    useChatQuery({
+      queryKey,
+      apiUrl,
+      paramKey,
+      paramValue,
+    });
   useChatSocket({ queryKey, addKey, updateKey });
   useChatScroll({
     chatRef,
@@ -67,21 +76,22 @@ const ChatMessages = ({
       </div>
     );
   }
+
   if (status === "error") {
     return (
       <div className="flex flex-col flex-1 justify-center items-center">
         <ServerCrash className="h-7 w-7 text-zinc-500 my-4" />
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Something went wrong
+          Something went wrong!
         </p>
       </div>
     );
   }
-  return (
-    <div className="flex-1 flex flex-col py-4 overflow-y-auto" ref={chatRef}>
-      {!hasNextPage && <div className="flex-1" />}
-      {!hasNextPage && <ChatWelcome name={name} type={type} />}
 
+  return (
+    <div ref={chatRef} className="flex-1 flex flex-col py-4 overflow-y-auto">
+      {!hasNextPage && <div className="flex-1" />}
+      {!hasNextPage && <ChatWelcome type={type} name={name} />}
       {hasNextPage && (
         <div className="flex justify-center">
           {isFetchingNextPage ? (
@@ -96,9 +106,8 @@ const ChatMessages = ({
           )}
         </div>
       )}
-
       <div className="flex flex-col-reverse mt-auto">
-        {data?.pages.map((group, i) => (
+        {data?.pages?.map((group, i) => (
           <Fragment key={i}>
             {group.items.map((message: MessageWithMemberWithProfile) => (
               <ChatItem
@@ -117,11 +126,8 @@ const ChatMessages = ({
             ))}
           </Fragment>
         ))}
-        {/* </div> */}
       </div>
       <div ref={bottomRef} />
     </div>
   );
 };
-
-export default ChatMessages;
