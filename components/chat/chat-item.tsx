@@ -38,6 +38,7 @@ interface ChatItemProps {
   isUpdated: boolean;
   socketUrl: string;
   socketQuery: Record<string, string>;
+  type: string;
 }
 const roleIconMap = {
   [MemberRole.GUEST]: null,
@@ -62,6 +63,7 @@ export const ChatItem = ({
   isUpdated,
   socketUrl,
   socketQuery,
+  type,
 }: ChatItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const { onOpen } = useModal();
@@ -92,7 +94,9 @@ export const ChatItem = ({
       });
       await axios.patch(url, values);
       setIsEditing(false);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -122,7 +126,10 @@ export const ChatItem = ({
   const isAdmin = currentMember.role === MemberRole.ADMIN;
   const isModerator = currentMember.role === MemberRole.MODERATOR;
   const isOwner = currentMember.id === member.id;
-  const canDeleteMessage = !deleted && (isAdmin || isModerator || isOwner);
+  const canDeleteMessage =
+    !deleted &&
+    (isAdmin || isModerator || isOwner) &&
+    (type === "channel" || (type === "conversation" && isOwner));
   const canEditMessage = !deleted && isOwner && !fileUrl;
   const isPDF = fileType === "pdf" && fileUrl;
   const isImage = !isPDF && fileUrl;

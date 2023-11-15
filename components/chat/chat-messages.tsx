@@ -122,6 +122,7 @@ export const ChatMessages = ({
                 isUpdated={message.updatedAt !== message.createdAt}
                 socketUrl={socketUrl}
                 socketQuery={socketQuery}
+                type={type}
               />
             ))}
           </Fragment>

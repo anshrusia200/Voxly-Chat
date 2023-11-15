@@ -45,7 +45,7 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
     try {
       const url = qs.stringifyUrl({
         url: apiUrl,
-        query,
+        query: query,
       });
       await axios.post(url, values);
       form.reset();
