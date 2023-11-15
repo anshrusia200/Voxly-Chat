@@ -103,7 +103,7 @@ export const ChatItem = ({
     form.reset({
       content: content,
     });
-  }, [content]);
+  }, [content, form]);
 
   // Attach an event listener when the component mounts
   useEffect(() => {
