@@ -38,10 +38,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setIsConnected(false);
     });
 
-    socketInstance.onAny(({ event, ...args }: any) => {
-      console.log("Event:", event, "Arguments:", args);
-    });
-
     setSocket(socketInstance);
 
     return () => {
