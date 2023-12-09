@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
-import { Plus, Smile } from "lucide-react";
+import { Plus, Smile, SendHorizontal } from "lucide-react";
 import { useModal } from "@/hooks/use-modal-store";
 import { Input } from "../ui/input";
 import axios from "axios";
@@ -62,17 +62,28 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <div className="relative p-4 pb-6">
-                  <button
-                    type="button"
-                    onClick={() => onOpen("messageFile", { apiUrl, query })}
-                    className="absolute top-7 left-8 h-[24px] w-[24px] bg-zinc-500 dark:bg-zinc-400 hover:bg-zinc-600 dark:hover:bg-zinc-300 transition rounded-full p-1 flex items-center justify-center"
-                  >
-                    <Plus className="text-white dark:text-[#313338]" />
-                  </button>
+                <div className="relative p-4 pb-6 pl-0 flex">
+                  <div className="flex px-2 items-center justify-between z-10">
+                    <div className="px-2">
+                      <button
+                        type="button"
+                        onClick={() => onOpen("messageFile", { apiUrl, query })}
+                        className="h-[24px] w-[24px] bg-zinc-500 dark:bg-zinc-400 hover:bg-zinc-600 dark:hover:bg-zinc-300 transition rounded-full p-1 flex items-center justify-center"
+                      >
+                        <Plus className="text-white dark:text-[#313338]" />
+                      </button>
+                    </div>
+                    <div className="h-[24px] w-[24px]">
+                      <EmojiPicker
+                        onChange={(emoji: string) =>
+                          field.onChange(`${field.value}${emoji}`)
+                        }
+                      />
+                    </div>
+                  </div>
                   <Input
                     disabled={isLoading}
-                    className="px-14 py-6 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="pl-6 pr-14 py-6 bg-zinc-200/90 dark:bg-zinc-700/75 border-none border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                     placeholder={`Message ${
                       type === "conversation" ? name : "#" + name
                     }`}
@@ -80,12 +91,11 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                     {...field}
                     ref={inputRef}
                   />
-                  <div className="absolute top-7 right-8">
-                    <EmojiPicker
-                      onChange={(emoji: string) =>
-                        field.onChange(`${field.value}${emoji}`)
-                      }
-                    />
+                  <div
+                    className="absolute top-7 right-8  cursor-pointer"
+                    onClick={form.handleSubmit(onSubmit)}
+                  >
+                    <SendHorizontal />
                   </div>
                 </div>
               </FormControl>
@@ -96,5 +106,4 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
     </Form>
   );
 };
-
 export default ChatInput;
